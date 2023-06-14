@@ -12,7 +12,8 @@
 function flamingogdpr_delete_contact() {  
   $contacts = get_posts(array(
     'fields' => 'ids',
-    'post_type'  => 'flamingo_contact'
+    'post_type'  => 'flamingo_contact',
+    'numberposts' => -1
   ));
 
   foreach ($contacts as $contact) {
@@ -22,11 +23,12 @@ function flamingogdpr_delete_contact() {
 
 function flamingogdpr_delete_inbound() {
   $posts = get_posts(array(    
-    'post_type'  => 'flamingo_inbound'
+    'post_type'  => 'flamingo_inbound',
+    'numberposts' => -1
   ));
   foreach ($posts as $post) {    
-    if (date_diff(new DateTimeImmutable($post->post_date), new DateTimeImmutable('now'))->d >= 7) {
-      wp_delete_post($post->ID);
+    if (date_diff(new DateTimeImmutable($post->post_date), new DateTimeImmutable('now'))->days >= 7) {
+      wp_delete_post($post->ID, true);
     }    
   }
 }
@@ -40,13 +42,13 @@ function flamingogdpr_execute_cron() {
 }
 
 # define cron jobs
-add_action( 'famingogdrp_cron', 'flamingogdpr_execute_cron' );
-if ( ! wp_next_scheduled( 'famingogdrp_cron' ) ) {
-  wp_schedule_event( time(), 'hourly', 'famingogdrp_cron' );
+add_action( 'flamingogdrp_cron', 'flamingogdpr_execute_cron' );
+if ( ! wp_next_scheduled( 'flamingogdrp_cron' ) ) {
+  wp_schedule_event( time(), 'hourly', 'flamingogdrp_cron' );
 }
 
-register_deactivation_hook( __FILE__, 'famingogdrp_deactivate' ); 
-function famingogdrp_deactivate() {
-    $timestamp = wp_next_scheduled( 'famingogdrp_cron' );
-    wp_unschedule_event( $timestamp, 'famingogdrp_cron' );
+register_deactivation_hook( __FILE__, 'flamingogdrp_deactivate' ); 
+function flamingogdrp_deactivate() {
+    $timestamp = wp_next_scheduled( 'flamingogdrp_cron' );
+    wp_unschedule_event( $timestamp, 'flamingogdrp_cron' );
 }
